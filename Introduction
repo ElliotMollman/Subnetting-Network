@@ -1,0 +1,8 @@
+This project's projected outcome is to create a single subnet for home users or servers on a 192.168.100.0 255.255.255.0 network bracnhed from a 192.168.1.0 255.255.255.0 network. Ip addresses will be issued by DHCP.
+#######
+#######
+Devices used:
+1. Managed Cisco Switch SF300 24 port
+2. Cisco Router 1921 
+3. Home Router
+4. Home PC
