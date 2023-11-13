@@ -1,0 +1,42 @@
+Cisco Switch SF300 24 port Config
+
+Held the reset button for 30 sec to reset configuration. Default username and password is cisco.
+
+Vlan Basics:
+Untagged VLANs
+A switchport may be a ‘tagged’ or ‘untagged’ port. An untagged port, or access port on a Cisco switch, connects to hosts (such as a server). The host is unaware of any VLAN configuration.
+The connected host sends its traffic without any VLAN tag on the frames. When the frame reaches the switch port, the switch will add the VLAN tag. The switch port is configured with a VLAN ID that it will put into the tag.
+Most switch ports will use this mode by default, with VLAN ID 1. When a frame leaves an untagged port, the switch strips the VLAN tag from the frame. The traffic is then forwarded as normal.
+
+Tagged VLANs
+A port is a ‘tagged port’ when the interface is expecting frames containing VLAN tags. An example of this is when two switches are connected, and pass tagged traffic. Cisco switches use the term ‘trunk’ to refer to a tagged port.
+The sender will send a frame with a VLAN tag. The receiving switch will see the VLAN tag, and if the VLAN is allowed, it will forward the frame as required. For example, a broadcast may be received on VLAN 10. In this case, 
+the switch will flood the frame to all other ports configured with VLAN 10.
+
+
+In short, trunk ports are used between switches and can be tagged with the vlan tag or left untagged. Aaccess are ports used between switch and host. Native vlan is used when sending  untagged packets into a tagged port.
+
+
+For this switch, I will be using it for subnetting a network using vlans for each subnet. I am using untagged on a trunk port (for some reason it wasn’t working with tagged) on a vlan. This switch will be the primary switch to deliver packets to each subnet. 
+Vlans allow the Logical grouping of subnets on ports, defined by the router. The switch does not create subnets. It only utilizes vlans to separate multiple subnets. Imagine 5 routers with different subnets connected to 1 switch with 5 vlans. Each vlan with 
+separate connection to each of the 5 routers.
+ 
+Here are the steps I took;
+
+-Enabled jumbo frames
+-Enabled CoS/802.1p-DSCP
+-Changed  hostname to SF300
+-Changed default vlan 1 ip to 192.168.1.160
+-Enabled password encryption, and changed default password
+-Created vlan with vlan ID 2
+-Gave vlan 1 access ports 9-11, and 21-24, and trunk 12, ALL UNTAGGED
+-Gave vlan ip of 192.168.100.3
+-enabled dhcp pool of 192.168.100.0 255.255.255.0 network
+-enabled dhcp relay
+-changed relay address to connected router on port 12 (192.168.100.1) and also home router for shits and giggles. 
+-gave dns server 8.8.8.8 4.2.2.2
+-changed default router to connected router (192.168.100.1)
+-changed time-out session to “never”
+
+NOTE: If you use static ip, make sure to use the 192.168.100.1 router, and not the vlan address 192.168.100.3. You want the packets directed to a default router, and the traffic will be automatically routed to home router once configured on 1921 cisco router.
+The rest of configuration is made on the 1921 cisco router.
