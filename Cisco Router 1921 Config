@@ -1,0 +1,59 @@
+Cisco Router 1921
+First I reset the router to it’s default configuration.
+
+Hostname: CiscoRouter1921
+Set ip address on the FE 0/0 to 192.168.1.2, and  FE 0/1 port to 192.168.100.1.
+0/0 linked to my router and 0/1 linked to port 12 on my switch SF300 24 port. 
+
+
+Create access-list to allow traffic in and out of interfaces. In this case we are going to let any in and out and let the switch decide the routing procedures. Create a standard list with name “NewNet” we will add NewNet to the interfaces.
+#conf
+#ip access-list standard NewNet
+#permit any
+
+Create a DHCP pool for the 192,168.100.0 network called Net192.168.100
+#ip dhcp pool Net192.168.100
+# define network as 192.168.100.0 255.255.255.0
+# then add dns servers 8.8.8.8 4.2.2.2
+# then default router 192.168.100.1
+
+On interface 0/0 use commands
+#conf
+#interface GigabitEthernet 0/0
+#no shut
+#ip address 192.168.1.2 255.255.255.0
+#ip nat outside
+#ip access-group NewNet in (allowing access-list name “NewNet” traffic in)
+#ip access-group NewNet out (allowing access-list name “NewNet” traffic out)
+#ip helper-address 192.168.1.1
+#ip dhcp relay information trusted (this will allow dhcp though this port i think)
+
+On interface 0/1 use commands
+#conf
+#interface GigabitEthernet 0/1
+#no shut
+#ip address 192.168.100.1
+#ip nat inside
+#ip access-group NewNet in (allowing access-list name “NewNet” traffic in)
+#ip access-group NewNet out (allowing access-list name “NewNet” traffic out)
+#ip helper-address 192.168.1.1
+#ip dhcp relay information trusted (this will allow dhcp though this port i think)
+
+
+Add IP name-servers for DNS, max is 8 addresses
+#ip name-server 8.8.8.8 4.2.2.2 192.168.1.1 8.8.4.4
+
+Now we need to define our routing tables 
+#ip route 0.0.0.0 0.0.0.0 192.168.1.1 (this will direct any incoming traffic with any net mask to home router. This way the switch’s packets will be directed to it)
+#ip route 192.168.100.0 255.255.255.0 192.168.1.1 (just in case, I added this to send the 192.168.100.0 subnet packets to my next router, which is home router 192.168.1.1)
+
+Then we need to permit any Vlan ID into the 0/1 interface connected to our switch. In this case, my vlan has the ID tag 2. You do not need to add the ip address of the network because it’s already connected to the interface, that is what the console said. Otherwise you would do “ip add 192.168.100.3” I think, because the switch will strip the host address off and replace it with it’s own)
+#interface GigabitEthernet 0/1.2
+#encapsulation dot1Q 2 (allows vlan ID 2 in)
+#ip address dhcp
+
+Then there are these lasts commands:
+#ip dns server (enables dns)
+#ip nat inside source list NewNet interface GigabitEthernet0/0 overload (uses the permit any)
+
+-END
