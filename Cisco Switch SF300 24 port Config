@@ -33,7 +33,7 @@ Here are the steps I took;
 -Gave vlan ip of 192.168.100.3
 -enabled dhcp pool of 192.168.100.0 255.255.255.0 network
 -enabled dhcp relay
--changed relay address to connected router on port 12 (192.168.100.1) and also home router for shits and giggles. 
+-changed relay address to connected router on port 12 (192.168.100.1) and also home router. 
 -gave dns server 8.8.8.8 4.2.2.2
 -changed default router to connected router (192.168.100.1)
 -changed time-out session to “never”
